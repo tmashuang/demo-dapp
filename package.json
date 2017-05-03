@@ -1,0 +1,16 @@
+{
+  "name": "demo-dapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "beefy index.js:bundle.js --live --open --index=./index.html --cwd ./",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "eth-query": "^2.1.0",
+    "ethereumjs-util": "^5.1.1"
+  }
+}
