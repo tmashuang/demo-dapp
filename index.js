@@ -1,5 +1,7 @@
 const EthQuery = require('eth-query')
 const EthUtil = require('ethereumjs-util')
+const Eth = require('ethjs')
+const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io'))
 
 window.addEventListener('load', startApp)
 
@@ -10,29 +12,44 @@ function startApp () {
   }
   const provider = web3.currentProvider
   const query = new EthQuery(provider)
-  const account = '0xedDbB091d94d4a11084A4306Bb945F509Fd51dB4'
+  let account, txReceipt
   
-
-  // var contractABi = [{"constant":false,"inputs":[{"name":"x","type":"uint256"}],"name":"set","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"get","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"}]
-  const contract = '0xF74176bD80708bab197a0b5063C57440fd9feA59'
-  
-
   button('gasPrice', () => query.gasPrice(buffOut))
-  button('accounts', () => query.accounts(handleResult))
+  button('estimateGas', () => query.estimateGas({from: account, to: account}, buffOut))
   button('blockNumber', () => query.blockNumber(buffOut))
+  button('accounts', () => query.accounts((err, res) => {
+    if (err) return showError(err)
+    account = res[0]
+    console.log(account)  
+  })
+)
+  button('getBlockByNumber', () => query.getBlockByNumber(buffOut))
+  button('sendTransaction', () => query.sendTransaction({from: account, to: account}, (err, res) => {
+    if (err) return showError(err)
+    txReceipt = res
+  }))
+  button('getTransactionReceipt', () => query.getTransactionReceipt(txReceipt, handleResult))
+  button('getBlockByHash', () => query.getBlockByHash(handleResult))
   button('getBlockTransactionCountByHash', () => query.getBlockTransactionCountByHash(handleResult))
   button('getBlockTransactionCountByNumber', () => query.getBlockTransactionCountByNumber(handleResult))
-  button('sendTransaction', () => query.sendTransaction({from: account, to: contract, gasPrice: 123456}, handleResult))
-  button('estimateGas', () => query.estimateGas({from: account, to: contract}, buffOut))
-  button('getBlockByHash', () => query.getBlockByHash(handleResult))
-  button('getBlockByNumber', () => query.getBlockByNumber(buffOut))
+  // button('sendTransaction', () => query.sendTransaction({from: account, to: contract, gasPrice: '0x4a817c800'}, handleResult))
+  // button('sendTransaction', () => query.sendTransaction({from: account, to: contract, gasPrice: '0x9502f9000'}, handleResult))
   button('getTransactionByHash', () => query.getTransactionByHash(handleResult))
-  button('getTransactionReceipt', () => query.getTransactionReceipt(receipt, handleResult))
   button('getTransactionCount', () => query.getTransactionCount(handleResult))
   button('getStorageAt', () => query.getStorageAt(account, 1, handleResult))
   button('getBalance', () => query.getBalance(account, handleResult))
-
+  // button('deploy contract', () => simpleStore.new({}).then(function(txHash) {
+    
+  // }))
 }
+
+// function watchContract () {
+//   var myEvent = contract.Evt({}, {fromBlock: 0, toBlock: 'latest'})
+//   myEvent.watch(function(err, result) {
+//     console.log('on watch')
+//     console.log(arguments)
+//   })
+// }
 
 function transactionReceipt (err, res) {
   if (err) return showError(err)
@@ -45,12 +62,12 @@ function transactionReceipt (err, res) {
 // }
 
 function buffOut (err, res) {
-  if (err) return showError(error)
+  if (err) return showError(err)
   console.log(EthUtil.bufferToInt(res))
 }
 
 function handleResult (err, result)  {
-  if (err) return showError(err)
+  if (err) return showError(err) && console.log(err)
     console.log(result)
 }
 
