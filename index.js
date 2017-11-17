@@ -13,6 +13,11 @@ function startApp () {
   const provider = web3.currentProvider
   const query = new EthQuery(provider)
   let account, txReceipt
+  account = query.accounts((err, res) => {
+    if (err) return showError(err)
+    account = res[0]
+    console.log(account)  
+  })
   
   button('gasPrice', () => query.gasPrice(buffOut))
   button('estimateGas', () => query.estimateGas({from: account, to: account}, buffOut))
