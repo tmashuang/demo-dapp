@@ -33,6 +33,14 @@ function startApp () {
     if (err) return showError(err)
     txReceipt = res
   }))
+  button('sendTransactionEmptyString', () => query.sendTransaction({from: account, to: ''}, (err, res) => {
+    if (err) return showError(err)
+    txReceipt = res
+  }))
+  button('sendTransaction0x', () => query.sendTransaction({from: account, to: '0x'}, (err, res) => {
+    if (err) return showError(err)
+    txReceipt = res
+  }))
   button('getTransactionReceipt', () => query.getTransactionReceipt(txReceipt, handleResult))
   button('getBlockByHash', () => query.getBlockByHash(handleResult))
   button('getBlockTransactionCountByHash', () => query.getBlockTransactionCountByHash(handleResult))
