@@ -16,6 +16,7 @@ exports.buildWebDriver = function buildWebDriver () {
   const encodedExtension = data.toString('base64')
 
   return new webdriver.Builder()
+    .usingServer('http://127.0.0.1:8696')
     .withCapabilities({
       chromeOptions: {
         extensions: [encodedExtension]

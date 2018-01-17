@@ -73,19 +73,19 @@ describe('Initializtion', function () {
 
   // This will go though the import flow comment out seed copying on 106-113 if using this flow.
 
-  it('imports an existing account', async function () {
-    await delay(500)
-    const importAccountButton = await driver.findElement(By.xpath(
-      '//*[@id="app-content"]/div/div[4]/div/div[3]/p'
-    ))
-    await importAccountButton.click()
-  })
+  // it('imports an existing account', async function () {
+  //   await delay(500)
+  //   const importAccountButton = await driver.findElement(By.xpath(
+  //     '//*[@id="app-content"]/div/div[4]/div/div[3]/p'
+  //   ))
+  //   await importAccountButton.click()
+  // })
 
-  it('input twelve word seed phrase', async function () {
-    await delay(300)
-    const seedInputTextArea = await driver.findElement(By.className('twelve-word-phrase'))
-    seedInputTextArea.sendKeys('input seed phrase')
-  })
+  // it('input twelve word seed phrase', async function () {
+  //   await delay(300)
+  //   const seedInputTextArea = await driver.findElement(By.className('twelve-word-phrase'))
+  //   seedInputTextArea.sendKeys('input seed phrase')
+  // })
 
   it('should accept password with length of eight', async () => {
     await delay(300)
@@ -97,19 +97,20 @@ describe('Initializtion', function () {
     passwordBoxConfirm.sendKeys('123456789')
     await delay(300)
     // Use if going through account creation flow.
-    // await button[0].click()
-    await button[1].click()
+    await button[0].click()
+    // await button[1].click()
   })
 
   // For Account Creation
-  // it('should show value was created and seed phrase', async () => {
-  //   await delay(700)
-  //   // Saves seed phrase
-  //   this.seedPhase = await driver.findElement(By.className('twelve-word-phrase')).getText()
-  //   const continueAfterSeedPhrase = await driver.findElement(By.css('button'))
-  //   await continueAfterSeedPhrase.click()
-  //   await delay(300)
-  // })
+  it('should show value was created and seed phrase', async () => {
+    await delay(700)
+    // Saves seed phrase
+    this.seedPhase = await driver.findElement(By.className('twelve-word-phrase')).getText()
+    const continueAfterSeedPhrase = await driver.findElement(By.css('button'))
+    await continueAfterSeedPhrase.click()
+    await delay(300)
+  })
+
   describe('Switch to test network', function () {
     
     it('network indicator click', async function () {
@@ -158,12 +159,17 @@ describe('Initializtion', function () {
     it('should show Metamask popoup when account is loaded', async function () {
       await delay(300)
       const window = await driver.getAllWindowHandles()
-      await driver.switchTo().window(window[1])
+      await delay(300)
     })
+
     it('Confrim Transaction', async function () {
+      const window = await driver.getAllWindowHandles()
+      await driver.switchTo().window(window[1])
       await delay(500)
-      const submitTransactionButton = await driver.findElement(By.className('confirm'))
-      submitTransactionButton.click()  
+      // const submitTransactionButton = await driver.findElement(By.className('confirm'))
+      const rejectTranasctionButton = await driver.findElement(By.className('cancel'))
+      // submitTransactionButton.click()
+      rejectTranasctionButton.click()
     })
   })
 
