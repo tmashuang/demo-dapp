@@ -1,7 +1,5 @@
-const EthQuery = require('eth-query')
-const EthUtil = require('ethereumjs-util')
-const Eth = require('ethjs')
-const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io'))
+
+const Web3 = require('web3')
 
 window.addEventListener('load', startApp)
 
@@ -10,80 +8,22 @@ function startApp () {
     const main = document.getElementById('main')
     return main.innerHTML = '<h1>No web3 detected</h1>'
   }
-  const provider = web3.currentProvider
-  const query = new EthQuery(provider)
-  let account, txReceipt
-  account = query.accounts((err, res) => {
-    if (err) return showError(err)
-    account = res[0]
-    console.log(account)  
+
+  const web3 = new Web3(window.web3.currentProvider)
+  global.web3 = web3
+
+  button('call contract on ropsten', () => {
+    web3.eth.getAccounts().then(accounts => {
+
+      var abi = [{"constant":true,"inputs":[],"name":"rate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"weiRaised","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"closingTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"openingTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_rate","type":"uint256"},{"name":"_openingTime","type":"uint256"},{"name":"_closingTime","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"purchaser","type":"address"},{"indexed":true,"name":"beneficiary","type":"address"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"TokenPurchase","type":"event"},{"constant":false,"inputs":[{"name":"_beneficiary","type":"address"}],"name":"buyTokens","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_token","type":"address"}],"name":"setToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"hasClosed","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"remainingSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_amount","type":"uint256"}],"name":"burnTokens","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"withdrawFunds","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}];
+
+      var contract = new web3.eth.Contract(abi,'0x96c60DDa637487820AF1858b94b5c732F0beFfD3');
+      contract.methods.buyTokens(accounts[0]).send({ from: accounts[0], value: web3.utils.toWei('0.00005', 'ether')})
+      .then(receipt => console.log(receipt));
+
+    })
   })
-  
-  button('gasPrice', () => query.gasPrice(buffOut))
-  button('estimateGas', () => query.estimateGas({from: account, to: account}, buffOut))
-  button('blockNumber', () => query.blockNumber(buffOut))
-  button('accounts', () => query.accounts((err, res) => {
-    if (err) return showError(err)
-    account = res[0]
-    console.log(account)  
-  })
-)
-  button('getBlockByNumber', () => query.getBlockByNumber(buffOut))
-  button('sendTransaction', () => query.sendTransaction({from: account, to: account}, (err, res) => {
-    if (err) return showError(err)
-    txReceipt = res
-  }))
-  button('sendTransactionEmptyString', () => query.sendTransaction({from: account, to: ''}, (err, res) => {
-    if (err) return showError(err)
-    txReceipt = res
-  }))
-  button('sendTransaction0x', () => query.sendTransaction({from: account, to: '0x'}, (err, res) => {
-    if (err) return showError(err)
-    txReceipt = res
-  }))
-  button('getTransactionReceipt', () => query.getTransactionReceipt(txReceipt, handleResult))
-  button('getBlockByHash', () => query.getBlockByHash(handleResult))
-  button('getBlockTransactionCountByHash', () => query.getBlockTransactionCountByHash(handleResult))
-  button('getBlockTransactionCountByNumber', () => query.getBlockTransactionCountByNumber(handleResult))
-  // button('sendTransaction', () => query.sendTransaction({from: account, to: contract, gasPrice: '0x4a817c800'}, handleResult))
-  // button('sendTransaction', () => query.sendTransaction({from: account, to: contract, gasPrice: '0x9502f9000'}, handleResult))
-  button('getTransactionByHash', () => query.getTransactionByHash(handleResult))
-  button('getTransactionCount', () => query.getTransactionCount(handleResult))
-  button('getStorageAt', () => query.getStorageAt(account, 1, handleResult))
-  button('getBalance', () => query.getBalance(account, handleResult))
-  // button('deploy contract', () => simpleStore.new({}).then(function(txHash) {
-    
-  // }))
 }
-
-// function watchContract () {
-//   var myEvent = contract.Evt({}, {fromBlock: 0, toBlock: 'latest'})
-//   myEvent.watch(function(err, result) {
-//     console.log('on watch')
-//     console.log(arguments)
-//   })
-// }
-
-function transactionReceipt (err, res) {
-  if (err) return showError(err)
-  console.log(res)
-}
-
-// function getBalance (hex) {  
-//   const shit = EthUtil.bufferToInt(hex)
-//   console.log(JSON.stringify(shit))
-// }
-
-function buffOut (err, res) {
-  if (err) return showError(err)
-  console.log(EthUtil.bufferToInt(res))
-}
-
-function handleResult (err, result)  {
-  if (err) return showError(err) && console.log(err)
-    console.log(result)
-}
-
 
 function button (id, cb) {
   const main = document.getElementById('main')
@@ -93,11 +33,4 @@ function button (id, cb) {
   button.innerText = id
   button.addEventListener('click', cb)
   main.appendChild(button)
-}
-
-function showError (message) {
-  var errContainer = document.getElementById('err')
-  errContainer.style.background = ' #ffd6cc'
-  errContainer.style.color = '#ff471a'
-  errContainer.innerText = message
 }
